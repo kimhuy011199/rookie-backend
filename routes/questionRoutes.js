@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getQuestions,
+  getQuestion,
   createQuestion,
   updateQuestion,
   deleteQuestion,
@@ -9,9 +10,10 @@ const {
 
 const { protect } = require('../middleware/authMiddleware');
 
-router.route('/').get(protect, getQuestions).post(protect, createQuestion);
+router.route('/').get(getQuestions).post(protect, createQuestion);
 router
   .route('/:id')
+  .get(getQuestion)
   .delete(protect, deleteQuestion)
   .put(protect, updateQuestion);
 

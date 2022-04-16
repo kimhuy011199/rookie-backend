@@ -11,6 +11,15 @@ const getQuestions = asyncHandler(async (req, res) => {
   res.status(200).json(questions);
 });
 
+// @desc    Get questions
+// @route   GET /api/questions/:id
+// @access  Private
+const getQuestion = asyncHandler(async (req, res) => {
+  const question = await Question.findById(req.params.id);
+
+  res.status(200).json(question);
+});
+
 // @desc    Create question
 // @route   POST /api/questions
 // @access  Private
@@ -89,6 +98,7 @@ const deleteQuestion = asyncHandler(async (req, res) => {
 
 module.exports = {
   getQuestions,
+  getQuestion,
   createQuestion,
   updateQuestion,
   deleteQuestion,
