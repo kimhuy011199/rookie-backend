@@ -1,5 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
+const cors = require('cors');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const port = process.env.PORT || 5000;
 const connectDB = require('./config/db');
@@ -7,6 +8,10 @@ const connectDB = require('./config/db');
 connectDB();
 
 const app = express();
+
+app.use(
+  cors({ origin: [process.env.DEV_ORIGIN_URL, process.env.PROD_ORIGIN_URL] })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
