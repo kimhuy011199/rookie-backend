@@ -7,19 +7,23 @@ const User = require('../models/userModel');
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { displayName, email, password } = req.body;
 
-  if (!name || !email || !password) {
+  if (!displayName || !email || !password) {
     res.status(400);
     throw new Error('Please add all fields');
   }
 
   // Check if user exists
-  const userExists = await User.findOne({ email });
-
-  if (userExists) {
+  const emailExists = await User.findOne({ email });
+  const displayNameExists = await User.findOne({ displayName });
+  if (emailExists) {
     res.status(400);
-    throw new Error('User already exists');
+    throw new Error('Email already exists');
+  }
+  if (displayNameExists) {
+    res.status(400);
+    throw new Error('Display name already exists');
   }
 
   // Hash password
@@ -28,7 +32,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Create user
   const user = await User.create({
-    name,
+    displayName,
     email,
     password: hashedPassword,
   });
@@ -36,7 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
   if (user) {
     res.status(201).json({
       _id: user.id,
-      name: user.name,
+      displayName: user.displayName,
       email: user.email,
       token: generateToken(user._id),
     });
@@ -64,7 +68,7 @@ const loginUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error('Invalid credentials');
+    throw new Error('Invalid email or password');
   }
 });
 
