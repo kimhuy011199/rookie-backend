@@ -15,6 +15,9 @@ const questionSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add question content'],
     },
+    tags: {
+      type: [String],
+    },
   },
   {
     timestamps: true,

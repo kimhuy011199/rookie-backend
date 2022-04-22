@@ -1,4 +1,5 @@
 const asyncHandler = require('express-async-handler');
+const showdown = require('showdown');
 
 const Question = require('../models/questionModel');
 
@@ -24,15 +25,18 @@ const getQuestion = asyncHandler(async (req, res) => {
 // @route   POST /api/questions
 // @access  Private
 const createQuestion = asyncHandler(async (req, res) => {
-  const { title, content } = req.body;
-  if (title || content) {
+  const { title, content: markdown, tags = [] } = req.body;
+  if (title || markdown) {
     res.status(400);
     throw new Error('Please add required field');
   }
+  const converter = new showdown.Converter();
+  const htmlCode = converter.makeHtml(markdown);
   const question = await Question.create({
     user: req.user.id,
     title,
-    content,
+    content: htmlCode,
+    tags,
   });
 
   res.status(200).json(question);
