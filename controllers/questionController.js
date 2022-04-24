@@ -12,7 +12,7 @@ const getQuestions = asyncHandler(async (req, res) => {
   res.status(200).json(questions);
 });
 
-// @desc    Get questions
+// @desc    Get question by id
 // @route   GET /api/questions/:id
 // @access  Private
 const getQuestion = asyncHandler(async (req, res) => {
