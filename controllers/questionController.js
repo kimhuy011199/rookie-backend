@@ -26,7 +26,7 @@ const getQuestion = asyncHandler(async (req, res) => {
 // @access  Private
 const createQuestion = asyncHandler(async (req, res) => {
   const { title, content: markdown, tags = [] } = req.body;
-  if (title || markdown) {
+  if (!title || !markdown) {
     res.status(400);
     throw new Error('Please add required field');
   }
