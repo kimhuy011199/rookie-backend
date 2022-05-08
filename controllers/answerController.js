@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 
 const Answer = require('../models/answerModel');
@@ -6,7 +7,9 @@ const Answer = require('../models/answerModel');
 // @route   GET /api/answers/:questionId
 // @access  Private
 const getAnswers = asyncHandler(async (req, res) => {
-  const answers = await Answer.find({ question: req.params.questionId });
+  const answers = await Answer.find({
+    question: mongoose.Types.ObjectId(req.params.id),
+  });
 
   res.status(200).json(answers);
 });
