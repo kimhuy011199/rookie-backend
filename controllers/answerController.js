@@ -28,7 +28,8 @@ const createAnswer = asyncHandler(async (req, res) => {
     user: req.user.id,
     question: questionId,
     content,
-    votes: 0,
+    userLikes: {},
+    likesCount: 0,
   });
 
   res.status(200).json(answer);
@@ -92,9 +93,50 @@ const deleteAnswer = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+// @desc    Like or unlike answer
+// @route   PUT /api/answers/:id/likes
+// @access  Private
+const likeOrUnlikeAnswer = asyncHandler(async (req, res) => {
+  const answer = await Answer.findById(req.params.id);
+
+  if (!answer) {
+    res.status(400);
+    throw new Error('Answer not found');
+  }
+
+  const newAnswer = { ...answer }._doc;
+  if (!newAnswer.userLikes[req.user.id] || !newAnswer.likesCount) {
+    newAnswer.userLikes[req.user.id] = true;
+    newAnswer.likesCount++;
+  } else {
+    delete newAnswer.userLikes[req.user.id];
+    newAnswer.likesCount--;
+  }
+
+  // Check for user
+  if (!req.user) {
+    res.status(401);
+    throw new Error('User not found');
+  }
+
+  const updatedAnswer = await Answer.findByIdAndUpdate(
+    req.params.id,
+    {
+      userLikes: newAnswer.userLikes,
+      likesCount: newAnswer.likesCount,
+    },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json(updatedAnswer);
+});
+
 module.exports = {
   getAnswers,
   createAnswer,
   updateAnswer,
   deleteAnswer,
+  likeOrUnlikeAnswer,
 };

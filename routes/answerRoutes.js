@@ -5,6 +5,7 @@ const {
   createAnswer,
   updateAnswer,
   deleteAnswer,
+  likeOrUnlikeAnswer,
 } = require('../controllers/answerController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -15,5 +16,6 @@ router
   .get(getAnswers)
   .delete(protect, deleteAnswer)
   .put(protect, updateAnswer);
+router.route('/:id/likes').put(protect, likeOrUnlikeAnswer);
 
 module.exports = router;

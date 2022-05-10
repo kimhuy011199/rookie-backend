@@ -16,7 +16,11 @@ const answerSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add answer content'],
     },
-    votes: {
+    userLikes: {
+      type: {},
+      default: {},
+    },
+    likesCount: {
       type: Number,
     },
   },
