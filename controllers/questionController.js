@@ -34,7 +34,7 @@ const createQuestion = asyncHandler(async (req, res) => {
   }
 
   const question = await Question.create({
-    user: req.user.id,
+    userId: req.user.id,
     title,
     content,
     tags,
@@ -59,7 +59,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
   // Make sure the logged in user matches the question user
-  if (question.user.toString() !== req.user.id) {
+  if (question.userId.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
   }
@@ -91,7 +91,7 @@ const deleteQuestion = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
   // Make sure the logged in user matches the question user
-  if (question.user.toString() !== req.user.id) {
+  if (question.userId.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
   }

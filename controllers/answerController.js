@@ -25,7 +25,7 @@ const createAnswer = asyncHandler(async (req, res) => {
   }
 
   const answer = await Answer.create({
-    user: req.user.id,
+    userId: req.user.id,
     question: questionId,
     content,
     userLikes: {},
@@ -51,7 +51,7 @@ const updateAnswer = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
   // Make sure the logged in user matches the answer user
-  if (answer.user.toString() !== req.user.id) {
+  if (answer.userId.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
   }
@@ -83,7 +83,7 @@ const deleteAnswer = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
   // Make sure the logged in user matches the answer user
-  if (answer.user.toString() !== req.user.id) {
+  if (answer.userId.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
   }

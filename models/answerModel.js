@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 const answerSchema = mongoose.Schema(
   {
-    user: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
-    question: {
+    questionId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Question',
