@@ -1,12 +1,27 @@
 const asyncHandler = require('express-async-handler');
-
 const Question = require('../models/questionModel');
+
+const QUESTIONS_PER_PAGES = 3;
 
 // @desc    Get questions
 // @route   GET /api/questions
 // @access  Private
 const getQuestions = asyncHandler(async (req, res) => {
-  const questions = await Question.find();
+  const { page, q } = req.query;
+
+  const limit = QUESTIONS_PER_PAGES;
+  const offset = page ? (page - 1) * limit : 0;
+  const condition = q
+    ? { title: { $regex: new RegExp(q), $options: 'i' } }
+    : {};
+
+  const data = await Question.paginate(condition, { offset, limit });
+  const questions = {
+    totalItems: data.totalDocs,
+    questionsList: data.docs,
+    totalPages: data.totalPages,
+    currentPage: data.page,
+  };
 
   res.status(200).json(questions);
 });
