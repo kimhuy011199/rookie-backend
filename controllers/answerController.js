@@ -8,7 +8,7 @@ const Answer = require('../models/answerModel');
 // @access  Private
 const getAnswers = asyncHandler(async (req, res) => {
   const answers = await Answer.find({
-    question: mongoose.Types.ObjectId(req.params.id),
+    questionId: mongoose.Types.ObjectId(req.params.id),
   });
 
   res.status(200).json(answers);
@@ -26,7 +26,7 @@ const createAnswer = asyncHandler(async (req, res) => {
 
   const answer = await Answer.create({
     userId: req.user.id,
-    question: questionId,
+    questionId,
     content,
     userLikes: {},
     likesCount: 0,
