@@ -16,6 +16,18 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a password'],
     },
+    about: {
+      type: String,
+    },
+    linkGithub: {
+      type: String,
+    },
+    linkLinkedIn: {
+      type: String,
+    },
+    avatarImg: {
+      type: String,
+    },
   },
   {
     timestamps: true,

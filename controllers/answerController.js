@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
 
 const Answer = require('../models/answerModel');
+const User = require('../models/userModel');
 
 // @desc    Get answers by question id
 // @route   GET /api/answers/:questionId
@@ -10,6 +11,11 @@ const getAnswers = asyncHandler(async (req, res) => {
   const answers = await Answer.find({
     questionId: mongoose.Types.ObjectId(req.params.id),
   });
+
+  for (let index = 0; index < answers.length; index++) {
+    const user = await User.findOne({ _id: answers[index].userId.toString() });
+    answers[index].user = user;
+  }
 
   res.status(200).json(answers);
 });
