@@ -1,5 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Question = require('../models/questionModel');
+const User = require('../models/userModel');
 
 const QUESTIONS_PER_PAGES = 3;
 
@@ -23,6 +24,13 @@ const getQuestions = asyncHandler(async (req, res) => {
     currentPage: data.page,
   };
 
+  for (let index = 0; index < questions.questionsList.length; index++) {
+    const user = await User.findOne({
+      _id: questions.questionsList[index].userId.toString(),
+    });
+    questions.questionsList[index].user = user;
+  }
+
   res.status(200).json(questions);
 });
 
@@ -35,6 +43,9 @@ const getQuestion = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Question not founds');
   }
+  const user = await User.findOne({ _id: question.userId.toString() });
+  question.user = user;
+
   res.status(200).json(question);
 });
 

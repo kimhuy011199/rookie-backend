@@ -8,6 +8,9 @@ const questionSchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
+    user: {
+      type: {},
+    },
     title: {
       type: String,
       required: [true, 'Please add question title'],
