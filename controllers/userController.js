@@ -77,6 +77,31 @@ const getMe = asyncHandler(async (req, res) => {
   res.status(200).json(req.user);
 });
 
+// @desc    Update user
+// @route   PUT /api/users/:id
+// @access  Private
+const updateUser = asyncHandler(async (req, res) => {
+  console.log(req.params.id);
+  const user = await User.findById(req.params.id);
+
+  // Check for user
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+  // Make sure the logged in user matches the question user
+  if (user._id.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+
+  res.status(200).json(updatedUser);
+});
+
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -88,4 +113,5 @@ module.exports = {
   registerUser,
   loginUser,
   getMe,
+  updateUser,
 };
