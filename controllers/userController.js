@@ -81,7 +81,6 @@ const getMe = asyncHandler(async (req, res) => {
 // @route   PUT /api/users/:id
 // @access  Private
 const updateUser = asyncHandler(async (req, res) => {
-  console.log(req.params.id);
   const user = await User.findById(req.params.id);
 
   // Check for user
@@ -89,7 +88,7 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('User not found');
   }
-  // Make sure the logged in user matches the question user
+  // Make sure the logged in user matches the user
   if (user._id.toString() !== req.user.id) {
     res.status(401);
     throw new Error('User not authorized');
@@ -100,6 +99,42 @@ const updateUser = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json(updatedUser);
+});
+
+// @desc    Change password
+// @route   PUT /api/users/:id/password
+// @access  Private
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  const { oldPassword, newPassword } = req.body;
+
+  // Check for user
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+  // Make sure the logged in user matches the user
+  if (user._id.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error('User not authorized');
+  }
+
+  if (user && (await bcrypt.compare(oldPassword, user.password))) {
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { password: hashedPassword },
+      {
+        new: true,
+      }
+    );
+    res.status(200).json(updatedUser);
+  } else {
+    res.status(400);
+    throw new Error('Invalid password');
+  }
 });
 
 // Generate JWT
@@ -114,4 +149,5 @@ module.exports = {
   loginUser,
   getMe,
   updateUser,
+  changePassword,
 };
