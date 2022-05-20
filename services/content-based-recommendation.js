@@ -51,9 +51,7 @@ class ContentBasedRecommendationSystem {
     // validation min score
     if (
       options.minScore !== undefined &&
-      (!_.isNumber(options.minScore) ||
-        options.minScore < 0 ||
-        options.minScore > 1)
+      (options.minScore < 0 || options.minScore > 1)
     ) {
       throw new Error('The option minScore should be a number between 0 and 1');
     }
@@ -62,34 +60,12 @@ class ContentBasedRecommendationSystem {
   }
 
   train(documents) {
-    this.validateDocuments(documents);
     // step 1 - preprocess the documents
     const preprocessDocs = this._preprocessDocuments(documents, this.options);
     // step 2 - create document vectors
     const docVectors = this._produceWordVectors(preprocessDocs, this.options);
     // step 3 - calculate similarities
     this.data = this._calculateSimilarities(docVectors, this.options);
-  }
-
-  validateDocuments(documents) {
-    // check if document is array of objects
-    if (!_.isArray(documents)) {
-      throw new Error('Documents should be an array of objects');
-    }
-
-    for (let i = 0; i < documents.length; i += 1) {
-      const document = documents[i];
-      // check if document has id and title key
-      if (!_.has(document, 'id') || !_.has(document, 'title')) {
-        throw new Error('Documents should be have fields id and title');
-      }
-      // check if document does not have tokens and vector key
-      if (_.has(document, 'tokens') || _.has(document, 'vector')) {
-        throw new Error(
-          '"tokens" and "vector" properties are reserved and cannot be used as document properties"'
-        );
-      }
-    }
   }
 
   getSimilarDocuments(id, start = 0, size = undefined) {
@@ -109,7 +85,7 @@ class ContentBasedRecommendationSystem {
     const processedDocuments = documents.map((item) => {
       let tokens = this._getTokensFromString(item.title);
       return {
-        id: item.id,
+        id: item._id.toString(),
         tokens,
         ...item,
       };

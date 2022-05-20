@@ -17,6 +17,6 @@ router
   .get(getQuestion)
   .delete(protect, deleteQuestion)
   .put(protect, updateQuestion);
-router.route(':/id/recommendation').get(getRecommendQuestions);
+router.route('/:id/recommendation').get(getRecommendQuestions);
 
 module.exports = router;

@@ -140,11 +140,11 @@ const getRecommendQuestions = asyncHandler(async (req, res) => {
   const documents = await Question.find();
 
   recommender.train(documents);
-  const recommendQuestions = recommender.getSimilarDocuments(
-    req.params.id,
-    0,
-    10
-  );
+  const recommendQuestions = recommender
+    .getSimilarDocuments(req.params.id, 0, 10)
+    .map((item) => {
+      return { ...item._doc, score: item.score };
+    });
 
   res.status(200).json(recommendQuestions);
 });
