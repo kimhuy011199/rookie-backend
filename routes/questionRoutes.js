@@ -6,6 +6,7 @@ const {
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  getRecommendQuestions,
 } = require('../controllers/questionController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -16,5 +17,6 @@ router
   .get(getQuestion)
   .delete(protect, deleteQuestion)
   .put(protect, updateQuestion);
+router.route(':/id/recommendation').get(getRecommendQuestions);
 
 module.exports = router;

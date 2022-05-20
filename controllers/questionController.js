@@ -2,6 +2,12 @@ const asyncHandler = require('express-async-handler');
 const Question = require('../models/questionModel');
 const User = require('../models/userModel');
 
+const ContentBasedRecommendationSystem = require('../services/content-based-recommendation');
+const recommender = new ContentBasedRecommendationSystem({
+  minScore: 0.01,
+  maxSimilarDocuments: 100,
+});
+
 const QUESTIONS_PER_PAGES = 3;
 
 // @desc    Get questions
@@ -127,10 +133,27 @@ const deleteQuestion = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
+// @desc    Get questions
+// @route   GET /api/questions/:id/recommendation
+// @access  Private
+const getRecommendQuestions = asyncHandler(async (req, res) => {
+  const documents = await Question.find();
+
+  recommender.train(documents);
+  const recommendQuestions = recommender.getSimilarDocuments(
+    req.params.id,
+    0,
+    10
+  );
+
+  res.status(200).json(recommendQuestions);
+});
+
 module.exports = {
   getQuestions,
   getQuestion,
   createQuestion,
   updateQuestion,
   deleteQuestion,
+  getRecommendQuestions,
 };
