@@ -35,13 +35,15 @@ const registerUser = asyncHandler(async (req, res) => {
     displayName,
     email,
     password: hashedPassword,
+    linkGithub: '',
+    linkLinkedIn: '',
+    avatarImg: '',
+    about: '',
   });
 
   if (user) {
     res.status(201).json({
-      _id: user.id,
-      displayName: user.displayName,
-      email: user.email,
+      ...user._doc,
       token: generateToken(user._id),
     });
   } else {
