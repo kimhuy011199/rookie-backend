@@ -2,7 +2,7 @@ const asyncHandler = require('express-async-handler');
 const Question = require('../models/questionModel');
 const User = require('../models/userModel');
 
-const ContentBasedRecommendationSystem = require('../services/content-based-recommendation');
+const ContentBasedRecommendationSystem = require('../core/services/content-based-recommendation');
 const recommender = new ContentBasedRecommendationSystem({
   minScore: 0.01,
   maxSimilarDocuments: 100,
