@@ -30,12 +30,15 @@ const createAnswer = asyncHandler(async (req, res) => {
     throw new Error('Please add answer content');
   }
 
+  const userId = req.user.id;
+  const user = await User.findById(userId);
   const answer = await Answer.create({
-    userId: req.user.id,
+    userId,
     questionId,
     content,
     userLikes: {},
     likesCount: 0,
+    user,
   });
 
   res.status(200).json(answer);
