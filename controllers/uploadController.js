@@ -13,7 +13,8 @@ const uploadImg = asyncHandler(async (req, res) => {
     const response = await cloudinary.uploader.upload(fileStr, {
       upload_preset: UPLOAD_PRESET,
     });
-    res.status(200).json({ url: response });
+    const { url } = response;
+    res.status(200).json({ url });
   } catch (err) {
     throw new Error('Something went wrong');
   }

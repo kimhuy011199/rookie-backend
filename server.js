@@ -13,7 +13,7 @@ app.use(
   cors({ origin: [process.env.DEV_ORIGIN_URL, process.env.PROD_ORIGIN_URL] })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/questions', require('./routes/questionRoutes'));
