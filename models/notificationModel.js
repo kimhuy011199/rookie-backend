@@ -15,14 +15,18 @@ const notificationSchema = mongoose.Schema(
     action: {
       type: {},
     },
-    content: {
-      type: String,
-      required: [true, 'Please add notification content'],
-    },
-    type: {
+    title: {
       type: String,
       required: true,
-    }
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,

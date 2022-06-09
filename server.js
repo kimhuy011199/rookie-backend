@@ -23,6 +23,7 @@ app.use('/api/questions', require('./routes/questionRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/answers', require('./routes/answerRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.use(errorHandler);
 
@@ -43,8 +44,8 @@ io.on(NOTI_ACTIONS.CONNECT, (socket) => {
   });
 
   socket.on(NOTI_ACTIONS.SEND_NOTI, (data) => {
-    const { userId, message } = data;
-    socket.to(userId).emit(NOTI_ACTIONS.RECEIVE_NOTI, message);
+    const userId = data.destination.userId;
+    socket.to(userId).emit(NOTI_ACTIONS.RECEIVE_NOTI, data);
   });
 
   socket.on(NOTI_ACTIONS.DISCONNECT, () => {

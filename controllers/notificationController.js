@@ -13,7 +13,9 @@ const getNotifications = asyncHandler(async (req, res) => {
   });
 
   for (let index = 0; index < notifications.length; index++) {
-    const action = await User.findOne({ _id: notifications[index].actionId.toString() });
+    const action = await User.findOne({
+      _id: notifications[index].actionId.toString(),
+    });
     notifications[index].action = action;
   }
 
@@ -26,7 +28,6 @@ const getNotifications = asyncHandler(async (req, res) => {
 const createNotification = asyncHandler(async (req, res) => {
   const { type, userId, actionDisplayName, commentContent } = req.body;
   // commented on your question
-  // liked your question
   // liked your comment
 
   const content = `${actionDisplayName} commented on your question (${commentContent})`;
@@ -35,10 +36,10 @@ const createNotification = asyncHandler(async (req, res) => {
     userId,
     actionId: req.user.id,
     action: {
-      displayName: actionDisplayName
+      displayName: actionDisplayName,
     },
     content,
-    type
+    type,
   });
 
   res.status(200).json(notification);
