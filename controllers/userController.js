@@ -95,6 +95,15 @@ const updateUser = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('User not authorized');
   }
+  // Email already existed
+  const { email } = req.body;
+  if (user.email !== email) {
+    const emailExists = await User.findOne({ email });
+    if (emailExists) {
+      res.status(400);
+      throw new Error('Email already exists');
+    }
+  }
 
   const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
