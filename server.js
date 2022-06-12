@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const { errorHandler } = require('./middleware/errorMiddleware');
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 443;
 const connectDB = require('./config/db');
 const { Server } = require('socket.io');
 const http = require('http');
@@ -12,9 +12,7 @@ connectDB();
 
 const app = express();
 
-app.use(
-  cors({ origin: [process.env.DEV_ORIGIN_URL, process.env.PROD_ORIGIN_URL] })
-);
+app.use(cors({ origin: process.env.ORIGIN_URL }));
 
 app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: false }));
@@ -30,7 +28,7 @@ app.use(errorHandler);
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.DEV_ORIGIN_URL,
+    origin: process.env.ORIGIN_URL,
     methods: ['GET', 'POST'],
   },
 });
