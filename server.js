@@ -44,7 +44,7 @@ io.on(NOTI_ACTIONS.CONNECT, (socket) => {
   });
 
   socket.on(NOTI_ACTIONS.SEND_NOTI, (data) => {
-    const userId = data.destination.userId;
+    const userId = data.userId;
     socket.to(userId).emit(NOTI_ACTIONS.RECEIVE_NOTI, data);
   });
 
