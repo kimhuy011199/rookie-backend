@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler');
 
 const Notification = require('../models/notificationModel');
 const User = require('../models/userModel');
+const Question = require('../models/questionModel');
 
 // @desc    Get notifications by user id
 // @route   GET /api/notification/:userId
@@ -17,6 +18,10 @@ const getNotifications = asyncHandler(async (req, res) => {
       _id: notifications[index].actionId.toString(),
     });
     notifications[index].action = action;
+    const question = await Question.findOne({
+      _id: notifications[index].questionId.toString(),
+    });
+    notifications[index].question = question;
   }
 
   res.status(200).json(notifications);
@@ -26,19 +31,26 @@ const getNotifications = asyncHandler(async (req, res) => {
 // @route   POST /api/notification
 // @access  Private
 const createNotification = asyncHandler(async (req, res) => {
-  const { type, userId, actionDisplayName, commentContent } = req.body;
-  // commented on your question
-  // liked your comment
+  const { type, userId, questionId } = req.body;
+  // A answered on your question B        type = 1
+  // A liked your comment on question B   type = 2
 
-  const content = `${actionDisplayName} commented on your question (${commentContent})`;
+  const existedNotification = await Notification.findOne({
+    questionId,
+    userId,
+    type,
+  });
+
+  if (existedNotification) {
+    await existedNotification.remove();
+  }
 
   const notification = await Notification.create({
     userId,
     actionId: req.user.id,
-    action: {
-      displayName: actionDisplayName,
-    },
-    content,
+    action: null,
+    questionId,
+    question: null,
     type,
   });
 

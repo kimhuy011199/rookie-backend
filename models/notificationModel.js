@@ -15,13 +15,13 @@ const notificationSchema = mongoose.Schema(
     action: {
       type: {},
     },
-    title: {
-      type: String,
+    questionId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
+      ref: 'Question',
     },
-    url: {
-      type: String,
-      required: true,
+    question: {
+      type: {},
     },
     type: {
       type: Number,
