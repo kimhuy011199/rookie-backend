@@ -14,15 +14,16 @@ const QUESTIONS_PER_PAGES = 3;
 // @route   GET /api/questions
 // @access  Private
 const getQuestions = asyncHandler(async (req, res) => {
-  const { page, q } = req.query;
+  const { page, search } = req.query;
 
   const limit = QUESTIONS_PER_PAGES;
   const offset = page ? (page - 1) * limit : 0;
-  const condition = q
-    ? { title: { $regex: new RegExp(q), $options: 'i' } }
+  const sort = { createdAt: -1 };
+  const condition = search
+    ? { title: { $regex: new RegExp(search), $options: 'i' } }
     : {};
 
-  const data = await Question.paginate(condition, { offset, limit });
+  const data = await Question.paginate(condition, { offset, limit, sort });
   const questions = {
     totalItems: data.totalDocs,
     questionsList: data.docs,
