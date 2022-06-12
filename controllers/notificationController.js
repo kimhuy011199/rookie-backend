@@ -11,7 +11,7 @@ const Question = require('../models/questionModel');
 const getNotifications = asyncHandler(async (req, res) => {
   const notifications = await Notification.find({
     userId: mongoose.Types.ObjectId(req.params.id),
-  });
+  }).sort({ createdAt: -1 });
 
   for (let index = 0; index < notifications.length; index++) {
     const action = await User.findOne({
