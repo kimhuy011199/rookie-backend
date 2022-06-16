@@ -20,7 +20,12 @@ const questionSchema = mongoose.Schema(
       required: [true, 'Please add question content'],
     },
     tags: {
-      type: [String],
+      type: [
+        {
+          _id: String,
+          name: String,
+        },
+      ],
     },
   },
   {
