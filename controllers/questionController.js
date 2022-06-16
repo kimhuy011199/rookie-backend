@@ -56,6 +56,21 @@ const getQuestion = asyncHandler(async (req, res) => {
   res.status(200).json(question);
 });
 
+// @desc    Get question by user id
+// @route   GET /api/questions/user/:id
+// @access  Private
+const getQuestionsByUserId = asyncHandler(async (req, res) => {
+  const question = await Question.find({ userId: req.params.id }).sort({
+    createdAt: -1,
+  });
+  if (!question) {
+    res.status(404);
+    throw new Error('Question not founds');
+  }
+
+  res.status(200).json(question);
+});
+
 // @desc    Create question
 // @route   POST /api/questions
 // @access  Private
@@ -153,6 +168,7 @@ const getRecommendQuestions = asyncHandler(async (req, res) => {
 module.exports = {
   getQuestions,
   getQuestion,
+  getQuestionsByUserId,
   createQuestion,
   updateQuestion,
   deleteQuestion,

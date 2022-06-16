@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getQuestions,
   getQuestion,
+  getQuestionsByUserId,
   createQuestion,
   updateQuestion,
   deleteQuestion,
@@ -18,5 +19,6 @@ router
   .delete(protect, deleteQuestion)
   .put(protect, updateQuestion);
 router.route('/:id/recommendation').get(getRecommendQuestions);
+router.route('/user/:id').get(getQuestionsByUserId);
 
 module.exports = router;
