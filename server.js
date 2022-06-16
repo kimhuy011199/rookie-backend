@@ -22,6 +22,7 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/answers', require('./routes/answerRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/tags', require('./routes/tagRoutes'));
 
 app.use(errorHandler);
 
