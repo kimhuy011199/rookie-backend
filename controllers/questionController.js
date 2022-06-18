@@ -19,8 +19,17 @@ const getQuestions = asyncHandler(async (req, res) => {
   const limit = QUESTIONS_PER_PAGES;
   const offset = page ? (page - 1) * limit : 0;
   const sort = { createdAt: -1 };
+
+  const indexOfCloseBracket = search.indexOf(']');
+  const tag =
+    indexOfCloseBracket !== -1 ? search.substring(1, indexOfCloseBracket) : '';
+  const title =
+    indexOfCloseBracket !== -1
+      ? search.substring(indexOfCloseBracket + 2)
+      : search.trim();
+
   const condition = search
-    ? { title: { $regex: new RegExp(search), $options: 'i' } }
+    ? { title: { $regex: new RegExp(title), $options: 'i' } }
     : {};
 
   const data = await Question.paginate(condition, { offset, limit, sort });
