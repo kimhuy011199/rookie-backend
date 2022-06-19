@@ -12,7 +12,7 @@ connectDB();
 
 const app = express();
 
-app.use(cors({ origin: process.env.ORIGIN_URL }));
+app.use(cors({ origin: [process.env.ORIGIN_URL, process.env.CMS_URL] }));
 
 app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: false }));
