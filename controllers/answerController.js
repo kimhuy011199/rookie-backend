@@ -4,13 +4,60 @@ const asyncHandler = require('express-async-handler');
 const Answer = require('../models/answerModel');
 const User = require('../models/userModel');
 
+const ANSWERS_PER_PAGES = 3;
+
 // @desc    Get answers by question id
 // @route   GET /api/answers/:questionId
 // @access  Private
-const getAnswers = asyncHandler(async (req, res) => {
+const getAnswersByQuestionId = asyncHandler(async (req, res) => {
   const answers = await Answer.find({
     questionId: mongoose.Types.ObjectId(req.params.id),
   });
+
+  for (let index = 0; index < answers.length; index++) {
+    const user = await User.findOne({ _id: answers[index].userId.toString() });
+    answers[index].user = user;
+  }
+
+  res.status(200).json(answers);
+});
+
+// @desc    Get answer by id
+// @route   GET /api/answers/:id
+// @access  Private
+const getAnswer = asyncHandler(async (req, res) => {
+  const answer = await Answer.findById(req.params.id);
+  if (!answer) {
+    res.status(404);
+    throw new Error('Answer not founds');
+  }
+  const user = await User.findOne({ _id: answer.userId.toString() });
+  answer.user = user;
+
+  res.status(200).json(answer);
+});
+
+// @desc    Get all answers
+// @route   GET /api/answers
+// @access  Private
+const paginateAnswers = asyncHandler(async (req, res) => {
+  const { page, search } = req.query;
+
+  const limit = ANSWERS_PER_PAGES;
+  const offset = page ? (page - 1) * limit : 0;
+  const sort = { createdAt: -1 };
+
+  const condition = search
+    ? { questionId: { $regex: new RegExp(questionId), $options: 'i' } }
+    : {};
+
+  const data = await Answer.paginate(condition, { offset, limit, sort });
+  const answers = {
+    totalItems: data.totalDocs,
+    list: data.docs,
+    totalPages: data.totalPages,
+    currentPage: data.page,
+  };
 
   for (let index = 0; index < answers.length; index++) {
     const user = await User.findOne({ _id: answers[index].userId.toString() });
@@ -143,7 +190,9 @@ const likeOrUnlikeAnswer = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getAnswers,
+  getAnswersByQuestionId,
+  getAnswer,
+  paginateAnswers,
   createAnswer,
   updateAnswer,
   deleteAnswer,
