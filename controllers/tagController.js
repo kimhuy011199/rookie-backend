@@ -24,7 +24,7 @@ const paginationTags = asyncHandler(async (req, res) => {
   const sort = { name: 1 };
 
   const condition = search
-    ? { title: { $regex: new RegExp(title), $options: 'i' } }
+    ? { name: { $regex: new RegExp(name), $options: 'i' } }
     : {};
 
   const data = await Tag.paginate(condition, { offset, limit, sort });
