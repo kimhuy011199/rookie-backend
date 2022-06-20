@@ -89,6 +89,11 @@ const createQuestion = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('Please add required field');
   }
+  const isTitleExisted = await Question.findOne({ title });
+  if (isTitleExisted) {
+    res.status(400);
+    throw new Error('Title already exists');
+  }
 
   const question = await Question.create({
     userId: req.user.id,
