@@ -1,0 +1,92 @@
+{
+  "DATABASE": {
+    "USER": {
+      "_id": "string",
+      "role": "string",
+      "displayName": "string",
+      "email": "string",
+      "password": "string",
+      "about": "string",
+      "linkGithub": "string",
+      "linkLinkedIn": "string",
+      "avatarImg": "string"
+    },
+    "QUESTION": {
+      "_id": "string",
+      "userId": {
+        "type": "string",
+        "ref": "USER"
+      },
+      "title": "string",
+      "content": "string"
+    },
+    "TAG": {
+      "_id": "string",
+      "name": "string"
+    },
+    "QUESTION-TAG": {
+      "_id": "string",
+      "questionId": {
+        "type": "string",
+        "ref": "QUESTION"
+      },
+      "tagId": {
+        "type": "string",
+        "ref": "TAG"
+      }
+    },
+    "ANSWER": {
+      "_id": "string",
+      "userId": {
+        "type": "string",
+        "ref": "USER"
+      },
+      "questionId": {
+        "type": "string",
+        "ref": "QUESTION"
+      },
+      "content": "string",
+      "likesCount": "number"
+    },
+    "LIKE-ANSWER": {
+      "_id": "string",
+      "userId": {
+        "type": "string",
+        "ref": "USER"
+      },
+      "answerId": {
+        "type": "string",
+        "ref": "ANSWER"
+      }
+    },
+    "NOTIFICATION": {
+      "_id": "string",
+      "userId": {
+        "type": "string",
+        "ref": "USER"
+      },
+      "actionId": {
+        "type": "string",
+        "ref": "USER"
+      },
+      "questionId": {
+        "type": "string",
+        "ref": "QUESTION"
+      },
+      "type": "number"
+    }
+  },
+  "RELATION": {
+    "QUESTION-TAG": "many-many",
+    "LIKE-ANSWER": "many-many"
+  },
+  "REST_API_NAME": {
+    "GET_ENTRIES": "getEntries - GET - entries/all",
+    "GET_ENTRIES_BY_ENTRY2_ID": "getEntriesByEntry2Id - GET - entries/entry2/:id",
+    "PAGINATE_ENTRIES": "paginateEntries - GET - entries",
+    "GET_ENTRY_BY_ID": "getEntryById - GET - entries/:id",
+    "CREATE_ENTRY": "createEntry - POST - entries",
+    "UPDATE_ENTRY": "updateEntry - UPDATE - entries/:id",
+    "DELETE_ENTRY": "deleteEntry - DELETE - entries/:id"
+  }
+}
