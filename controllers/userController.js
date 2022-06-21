@@ -113,6 +113,7 @@ const paginateUsers = asyncHandler(async (req, res) => {
     list: data.docs,
     totalPages: data.totalPages,
     currentPage: data.page,
+    itemsPerPage: data.limit,
   };
 
   res.status(200).json(users);

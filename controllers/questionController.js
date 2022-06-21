@@ -74,11 +74,13 @@ const paginateQuestions = asyncHandler(async (req, res) => {
   const condition = search ? { ...titleCondition, ...tagCondition } : {};
 
   const data = await Question.paginate(condition, { offset, limit, sort });
+  console.log(data);
   const questions = {
     totalItems: data.totalDocs,
     questionsList: data.docs,
     totalPages: data.totalPages,
     currentPage: data.page,
+    itemsPerPage: data.limit,
   };
 
   for (let index = 0; index < questions.questionsList.length; index++) {
