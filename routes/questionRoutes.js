@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getQuestions,
-  getQuestion,
   getQuestionsByUserId,
+  paginateQuestions,
+  getQuestions,
+  getQuestionById,
   createQuestion,
   updateQuestion,
   deleteQuestion,
@@ -12,13 +13,13 @@ const {
 
 const { protect } = require('../middleware/authMiddleware');
 
-router.route('/').get(getQuestions).post(protect, createQuestion);
-router
-  .route('/:id')
-  .get(getQuestion)
-  .delete(protect, deleteQuestion)
-  .put(protect, updateQuestion);
-router.route('/:id/recommendation').get(getRecommendQuestions);
-router.route('/user/:id').get(getQuestionsByUserId);
+router.get('/', paginateQuestions);
+router.get('/all', getQuestions);
+router.get('/user/:id', protect, getQuestionsByUserId);
+router.get('/:id', getQuestionById);
+router.get('/:id/recommendation', getRecommendQuestions);
+router.post('/', protect, createQuestion);
+router.put('/:id', protect, updateQuestion);
+router.delete('/:id', protect, deleteQuestion);
 
 module.exports = router;

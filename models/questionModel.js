@@ -14,18 +14,14 @@ const questionSchema = mongoose.Schema(
     title: {
       type: String,
       required: [true, 'Please add question title'],
+      unique: true,
     },
     content: {
       type: String,
       required: [true, 'Please add question content'],
     },
     tags: {
-      type: [
-        {
-          _id: String,
-          name: String,
-        },
-      ],
+      type: [],
     },
   },
   {
