@@ -16,6 +16,9 @@ const answerSchema = mongoose.Schema(
       required: true,
       ref: 'Question',
     },
+    question: {
+      type: {},
+    },
     content: {
       type: String,
       required: [true, 'Please add answer content'],
