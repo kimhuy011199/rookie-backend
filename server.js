@@ -1,12 +1,12 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
-const { errorHandler } = require('./middleware/errorMiddleware');
-const port = process.env.PORT || 443;
-const connectDB = require('./config/db');
 const { Server } = require('socket.io');
 const http = require('http');
+const connectDB = require('./config/db');
+const { errorHandler } = require('./middleware/errorMiddleware');
 const { NOTI_ACTIONS } = require('./core/contants/constants');
+const port = process.env.PORT || 443;
 
 connectDB();
 
@@ -18,11 +18,11 @@ app.use(express.json({ limit: '200kb' }));
 app.use(express.urlencoded({ extended: false }));
 
 app.use('/api/questions', require('./routes/questionRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/answers', require('./routes/answerRoutes'));
-app.use('/api/upload', require('./routes/uploadRoutes'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/tags', require('./routes/tagRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.use(errorHandler);
 
