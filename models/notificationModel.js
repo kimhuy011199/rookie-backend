@@ -7,6 +7,9 @@ const notificationSchema = mongoose.Schema(
       required: true,
       ref: 'User',
     },
+    user: {
+      type: {},
+    },
     actionId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
