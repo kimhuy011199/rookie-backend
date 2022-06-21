@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
+const { ERROR_MESSAGE } = '../core/constants/errorMessage';
+
 const User = require('../models/userModel');
 
 const protect = asyncHandler(async (req, res, next) => {
@@ -20,13 +22,13 @@ const protect = asyncHandler(async (req, res, next) => {
     } catch (error) {
       console.log(error);
       res.status(401);
-      throw new Error('Not authorized');
+      throw new Error(ERROR_MESSAGE.UNAUTHENTICATED);
     }
   }
 
   if (!token) {
     res.status(401);
-    throw new Error('Not authorized, no token');
+    throw new Error(ERROR_MESSAGE.UNAUTHENTICATED);
   }
 });
 
