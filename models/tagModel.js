@@ -4,8 +4,8 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const tagSchema = mongoose.Schema({
   name: {
     type: String,
-    required: true,
-  },
+    required: [true, 'Please add tag name']
+  }
 });
 
 tagSchema.plugin(mongoosePaginate);

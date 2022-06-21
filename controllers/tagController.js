@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
+const { ITEMS_PER_PAGE, ROLE } = require('../core/contants/constants');
+const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
 
 const Tag = require('../models/tagModel');
-const TAGS_PER_PAGES = 10;
 
-// @desc    Get all tags
-// @route   GET /api/tags
+// @type    GET_ENTRIES
+// @desc    Get tags
+// @route   GET /api/tags/all
 // @access  Public
 const getTags = asyncHandler(async (req, res) => {
   const tags = await Tag.find();
@@ -13,18 +15,20 @@ const getTags = asyncHandler(async (req, res) => {
   res.status(200).json(tags);
 });
 
-// @desc    Paginate all tags
-// @route   GET /api/tags/pagination
+// @type    PAGINATE_ENTRIES
+// @desc    Paginate tags
+// @route   GET /api/tags
 // @access  Public
 const paginationTags = asyncHandler(async (req, res) => {
   const { page, search } = req.query;
 
-  const limit = TAGS_PER_PAGES;
+  const limit = ITEMS_PER_PAGE.TAG;
   const offset = page ? (page - 1) * limit : 0;
   const sort = { name: 1 };
 
+  // Search by tag name
   const condition = search
-    ? { name: { $regex: new RegExp(name), $options: 'i' } }
+    ? { name: { $regex: new RegExp(search), $options: 'i' } }
     : {};
 
   const data = await Tag.paginate(condition, { offset, limit, sort });
@@ -38,48 +42,54 @@ const paginationTags = asyncHandler(async (req, res) => {
   res.status(200).json(tags);
 });
 
+// @type    GET_ENTRY_BY_ID
 // @desc    Get tag by id
 // @route   GET /api/tags/:id
-// @access  Private
-const getTag = asyncHandler(async (req, res) => {
+// @access  Public
+const getTagById = asyncHandler(async (req, res) => {
   const tag = await Tag.findById(req.params.id);
   if (!tag) {
     res.status(404);
-    throw new Error('Tag not founds');
+    throw new Error(ERROR_MESSAGE.TAG_NOT_FOUND);
   }
 
   res.status(200).json(tag);
 });
 
+// @type    CREATE_ENTRY
 // @desc    Create tag
 // @route   POST /api/tags
 // @access  Private
 const createTag = asyncHandler(async (req, res) => {
   const { name } = req.body;
+
+  // Check required fields
   if (!name) {
     res.status(400);
-    throw new Error('Please add required field');
+    throw new Error(ERROR_MESSAGE.REQUIRED_FIELD);
   }
-
-  const existedTag = await Tag.findOne({ name });
-  if (existedTag) {
+  // Check tag name already exists
+  const nameAlreadyExists = await Tag.findOne({ name });
+  if (nameAlreadyExists) {
     res.status(400);
-    throw new Error('Tag name already existed');
+    throw new Error(ERROR_MESSAGE.NAME_EXIST);
   }
 
   const tag = await Tag.create({ name });
   res.status(200).json(tag);
 });
 
+// @type    UPDATE_ENTRY
 // @desc    Update tag
 // @route   PUT /api/tags/:id
 // @access  Private
 const updateTag = asyncHandler(async (req, res) => {
   const tag = await Tag.findById(req.params.id);
 
+  // Check tag not founds
   if (!tag) {
-    res.status(400);
-    throw new Error('Tag not found');
+    res.status(404);
+    throw new Error(ERROR_MESSAGE.TAG_NOT_FOUND);
   }
 
   const updatedTag = await Tag.findByIdAndUpdate(req.params.id, req.body, {
@@ -89,15 +99,22 @@ const updateTag = asyncHandler(async (req, res) => {
   res.status(200).json(updatedTag);
 });
 
+// @type    DELETE_ENTRY
 // @desc    Delete tag
 // @route   DELETE /api/tags/:id
 // @access  Private
 const deleteTag = asyncHandler(async (req, res) => {
   const tag = await Tag.findById(req.params.id);
 
+  // Check tag not founds
   if (!tag) {
-    res.status(400);
-    throw new Error('Tag not found');
+    res.status(404);
+    throw new Error(ERROR_MESSAGE.TAG_NOT_FOUND);
+  }
+  // Check permission
+  if (req.user.role !== ROLE.ADMIN) {
+    res.status(403);
+    throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
 
   await tag.remove();
@@ -107,7 +124,7 @@ const deleteTag = asyncHandler(async (req, res) => {
 module.exports = {
   getTags,
   paginationTags,
-  getTag,
+  getTagById,
   createTag,
   updateTag,
   deleteTag,

@@ -3,14 +3,19 @@ const router = express.Router();
 const {
   getTags,
   paginationTags,
-  getTag,
+  getTagById,
   createTag,
   updateTag,
   deleteTag,
 } = require('../controllers/tagController');
 
-router.route('/').get(getTags).post(createTag);
-router.route('/pagination').get(paginationTags);
-router.route('/:id').get(getTag).put(updateTag).delete(deleteTag);
+const { protect } = require('../middleware/authMiddleware');
+
+router.get('/', paginationTags);
+router.get('/all', getTags);
+router.get('/:id', getTagById);
+router.post('/', protect, createTag);
+router.put('/:id', protect, updateTag);
+router.delete('/:id', protect, deleteTag);
 
 module.exports = router;
