@@ -3,10 +3,6 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 
 const userSchema = mongoose.Schema(
   {
-    roleId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Role',
-    },
     displayName: {
       type: String,
       required: [true, 'Please add a display name'],
@@ -31,6 +27,9 @@ const userSchema = mongoose.Schema(
       type: String,
     },
     avatarImg: {
+      type: String,
+    },
+    role: {
       type: String,
     },
   },

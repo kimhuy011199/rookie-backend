@@ -74,7 +74,6 @@ const paginateQuestions = asyncHandler(async (req, res) => {
   const condition = search ? { ...titleCondition, ...tagCondition } : {};
 
   const data = await Question.paginate(condition, { offset, limit, sort });
-  console.log(data);
   const questions = {
     totalItems: data.totalDocs,
     questionsList: data.docs,
@@ -194,7 +193,6 @@ const updateQuestion = asyncHandler(async (req, res) => {
     }
   );
 
-  console.log(updatedQuestion);
   res.status(200).json(updatedQuestion);
 });
 
