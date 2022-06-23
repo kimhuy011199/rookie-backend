@@ -31,18 +31,13 @@ const getQuestionsByUserId = asyncHandler(async (req, res) => {
 const getQuestions = asyncHandler(async (req, res) => {
   const { search } = req.query;
   const condition = search
-    ? { title: { $regex: new RegExp(title), $options: 'i' } }
+    ? { title: { $regex: new RegExp(search), $options: 'i' } }
     : {};
 
   // Search question by title
   const questions = await Question.find(condition).sort({
     createdAt: -1,
   });
-
-  if (!questions.length) {
-    res.status(404);
-    throw new Error(ERROR_MESSAGE.QUESTION_NOT_FOUND);
-  }
 
   res.status(200).json(questions);
 });
