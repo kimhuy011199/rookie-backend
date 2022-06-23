@@ -137,7 +137,7 @@ const createQuestion = asyncHandler(async (req, res) => {
   const titleAlreadyExists = await Question.findOne({ title });
   if (titleAlreadyExists) {
     res.status(400);
-    throw new Error(ERROR_MESSAGE.REQUIRED_FIELD);
+    throw new Error(ERROR_MESSAGE.TITLE_EXIST);
   }
   // Check user not founds
   if (!req.user) {
@@ -171,6 +171,15 @@ const updateQuestion = asyncHandler(async (req, res) => {
   if (!req.user) {
     res.status(401);
     throw new Error(ERROR_MESSAGE.USER_NOT_FOUND);
+  }
+  // Check title already exists
+  const { title } = req.body;
+  if (question.title !== title) {
+    const titleAlreadyExists = await Question.findOne({ title });
+    if (titleAlreadyExists) {
+      res.status(400);
+      throw new Error(ERROR_MESSAGE.TITLE_EXIST);
+    }
   }
   // Check permission
   const hasPermission =
