@@ -9,11 +9,13 @@ const {
   updateUser,
   changePassword,
   deleteUser,
+  resetPassword,
 } = require('../controllers/userController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/', registerUser);
 router.post('/login', loginUser);
+router.post('/reset-password/:id', protect, resetPassword);
 router.get('/', protect, paginateUsers);
 router.get('/me', protect, getMe);
 router.get('/:id', getUserById);

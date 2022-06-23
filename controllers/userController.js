@@ -11,7 +11,14 @@ const User = require('../models/userModel');
 // @route   POST /api/users
 // @access  Public
 const registerUser = asyncHandler(async (req, res) => {
-  const { displayName, email, password } = req.body;
+  const {
+    displayName,
+    email,
+    password,
+    linkGithub = '',
+    linkLinkedIn = '',
+    about = '',
+  } = req.body;
 
   // Check required fields
   if (!displayName || !email || !password) {
@@ -40,10 +47,10 @@ const registerUser = asyncHandler(async (req, res) => {
     displayName,
     email,
     password: hashedPassword,
-    linkGithub: '',
-    linkLinkedIn: '',
+    linkGithub,
+    linkLinkedIn,
+    about,
     avatarImg: '',
-    about: '',
     role: ROLE.MEMBER,
   });
 
@@ -156,7 +163,10 @@ const updateUser = asyncHandler(async (req, res) => {
   }
   // Check display name and role cannot change
   const { displayName, role } = req.body;
-  if (displayName || role) {
+  if (
+    (displayName && user.displayName !== displayName) ||
+    (role && user.role !== role)
+  ) {
     res.status(403);
     throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
@@ -249,6 +259,45 @@ const generateToken = (id) => {
   });
 };
 
+// @type    RESET_PASSWORD
+// @desc    Reset user password
+// @route   POST /api/users/reset-password/:id
+// @access  Private
+const resetPassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  // Check user not founds
+  if (!req.user || !user) {
+    res.status(404);
+    throw new Error(ERROR_MESSAGE.USER_NOT_FOUND);
+  }
+  // Check permission
+  if (!req.user?.role === ROLE.ADMIN) {
+    res.status(403);
+    throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
+  }
+
+  // Generate random password
+  const newPassword = bcrypt
+    .genSaltSync(10)
+    .toString()
+    .slice(10, 22)
+    .concat(0, 'z');
+
+  // Hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(newPassword, salt);
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { password: hashedPassword },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json(newPassword);
+});
+
 module.exports = {
   registerUser,
   loginUser,
@@ -258,4 +307,5 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
+  resetPassword,
 };
