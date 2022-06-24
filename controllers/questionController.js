@@ -6,6 +6,8 @@ const ContentBasedRecommendationSystem = require('../core/services/content-based
 const Question = require('../models/questionModel');
 const User = require('../models/userModel');
 const Tag = require('../models/tagModel');
+const Answer = require('../models/answerModel');
+const Notification = require('../models/notificationModel');
 
 const recommender = new ContentBasedRecommendationSystem({
   minScore: 0.01,
@@ -30,11 +32,19 @@ const getQuestionsByUserId = asyncHandler(async (req, res) => {
 // @access  Public
 const getQuestions = asyncHandler(async (req, res) => {
   const { search } = req.query;
+
+  // Search by id
+  const isId = (search && search.length === 24 && !search.split(' ')[1]);
+  if (isId) {
+    const question = await Question.findById(search);
+    return res.status(200).json([question]);
+  }
+
+  // Search by title
   const condition = search
     ? { title: { $regex: new RegExp(search), $options: 'i' } }
     : {};
 
-  // Search question by title
   const questions = await Question.find(condition).sort({
     createdAt: -1,
   });
@@ -53,6 +63,20 @@ const paginateQuestions = asyncHandler(async (req, res) => {
   const offset = page ? (page - 1) * limit : 0;
   const sort = { createdAt: -1 };
 
+  // Search by id
+  const isId = (search && search.length === 24 && !search.split(' ')[1]);
+  if (isId) {
+    const question = await Question.findById(search);
+    const questions = {
+      totalItems: 1,
+      questionsList: [question],
+      totalPages: 1,
+      currentPage: 0,
+      itemsPerPage: 1,
+    };
+    return res.status(200).json(questions);
+  }
+
   // Search by title + tag
   const indexOfCloseBracket = search.indexOf(']');
   const title =
@@ -61,11 +85,22 @@ const paginateQuestions = asyncHandler(async (req, res) => {
       : search.trim();
   const tag =
     indexOfCloseBracket !== -1 ? search.substring(1, indexOfCloseBracket) : '';
+  const tagId = await Tag.findOne({ name: tag });
+  if (tag && !tagId) {
+    const questions = {
+      totalItems: 0,
+      questionsList: [],
+      totalPages: 0,
+      currentPage: 0,
+      itemsPerPage: 0,
+    };
+    return res.status(200).json(questions);
+  }
 
   const titleCondition = title
     ? { title: { $regex: new RegExp(title), $options: 'i' } }
     : {};
-  const tagCondition = tag ? { tags: { name: tag } } : {};
+  const tagCondition = tagId ? { "tags._id": { $in: [tagId] } } : {};
   const condition = search ? { ...titleCondition, ...tagCondition } : {};
 
   const data = await Question.paginate(condition, { offset, limit, sort });
@@ -84,8 +119,8 @@ const paginateQuestions = asyncHandler(async (req, res) => {
     questions.questionsList[index].user = user;
   }
   for (let index = 0; index < questions.questionsList.length; index++) {
-    if (questions.questionsList[index].tags.length) {
-      for (let i = 0; i < questions.questionsList[index].tags.length; index++) {
+    if (questions.questionsList[index].tags.length > 0) {
+      for (let i = 0; i < questions.questionsList[index].tags.length; i++) {
         const tag = await Tag.findOne({
           _id: questions.questionsList[index].tags[i]._id.toString(),
         });
@@ -205,7 +240,8 @@ const updateQuestion = asyncHandler(async (req, res) => {
 // @route   DELETE /api/questions/:id
 // @access  Private
 const deleteQuestion = asyncHandler(async (req, res) => {
-  const question = await Question.findById(req.params.id);
+  const questionId = req.params.id;
+  const question = await Question.findById(questionId);
 
   // Check question is founded
   if (!question) {
@@ -225,9 +261,14 @@ const deleteQuestion = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
 
+  // Remove question
   await question.remove();
+  // Remove related answers
+  await Answer.deleteMany({ questionId });
+  // Remove related notifications
+  await Notification.deleteMany({ questionId });
 
-  res.status(200).json({ id: req.params.id });
+  res.status(200).json({ id: questionId });
 });
 
 // @type    GET_ENTRIES_RECOMMENDATION

@@ -21,7 +21,12 @@ const questionSchema = mongoose.Schema(
       required: [true, 'Please add question content'],
     },
     tags: {
-      type: [],
+      type: [
+        {
+          _id: mongoose.Schema.Types.ObjectId,
+          name: String,
+        }
+      ],
     },
   },
   {
