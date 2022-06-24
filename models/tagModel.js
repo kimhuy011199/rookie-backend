@@ -6,6 +6,7 @@ const tagSchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, 'Please add tag name'],
+      unique: true,
     },
   },
   {

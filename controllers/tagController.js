@@ -4,13 +4,14 @@ const { ITEMS_PER_PAGE, ROLE } = require('../core/contants/constants');
 const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
 
 const Tag = require('../models/tagModel');
+const Question = require('../models/questionModel');
 
 // @type    GET_ENTRIES
 // @desc    Get tags
 // @route   GET /api/tags/all
 // @access  Public
 const getTags = asyncHandler(async (req, res) => {
-  const tags = await Tag.find();
+  const tags = await Tag.find().sort({ name: 1 });
 
   res.status(200).json(tags);
 });
@@ -105,7 +106,8 @@ const updateTag = asyncHandler(async (req, res) => {
 // @route   DELETE /api/tags/:id
 // @access  Private
 const deleteTag = asyncHandler(async (req, res) => {
-  const tag = await Tag.findById(req.params.id);
+  const tagId = req.params.id;
+  const tag = await Tag.findById(tagId);
 
   // Check tag not founds
   if (!tag) {
@@ -118,8 +120,17 @@ const deleteTag = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
 
+  // Remove tag
   await tag.remove();
-  res.status(200).json({ id: req.params.id });
+  // Update question has removed tag
+  const relatedQuestions = await Question.find({ "tags._id": { $in: [tagId] } });
+  for (let index = 0; index < relatedQuestions.length; index++) {
+    const question = await Question.findOne({ _id: relatedQuestions[index]._id.toString() })
+    await question.tags.pull({ _id: tagId });
+    await question.save();
+  }
+
+  res.status(200).json({ id: tagId });
 });
 
 module.exports = {
