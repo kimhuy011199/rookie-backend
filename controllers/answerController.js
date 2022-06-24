@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
-const { ITEMS_PER_PAGE, ROLE } = require('../core/contants/constants');
+const { ITEMS_PER_PAGE, ROLE, NOTIFICATION_TYPE } = require('../core/contants/constants');
 const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
 
 const Answer = require('../models/answerModel');
 const User = require('../models/userModel');
 const Question = require('../models/questionModel');
+const Notification = require('../models/notificationModel');
 
 // @type    GET_ENTRIES_BY_ENTRY2_ID
 // @desc    Get answers by question id
@@ -148,7 +149,8 @@ const updateAnswer = asyncHandler(async (req, res) => {
 // @route   DELETE /api/answers/:id
 // @access  Private
 const deleteAnswer = asyncHandler(async (req, res) => {
-  const answer = await Answer.findById(req.params.id);
+  const answerId = req.params.id;
+  const answer = await Answer.findById(answerId);
 
   // Check answer not founds
   if (!answer) {
@@ -168,9 +170,13 @@ const deleteAnswer = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
 
+  // Remove answer
   await answer.remove();
+  // Remove related notifcation
+  const { questionId } = answer;
+  await Notification.deleteMany({ questionId, type: NOTIFICATION_TYPE.LIKE_COMMENT });
 
-  res.status(200).json({ id: req.params.id });
+  res.status(200).json({ id: answerId });
 });
 
 // @type    LIKE_UNLIKE_ENTRY
