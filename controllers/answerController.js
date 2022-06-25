@@ -117,7 +117,9 @@ const createAnswer = asyncHandler(async (req, res) => {
 // @route   PUT /api/answers/:id
 // @access  Private
 const updateAnswer = asyncHandler(async (req, res) => {
+  const { reqUserId } = req.body;
   const answer = await Answer.findById(req.params.id);
+  const userId = reqUserId ? reqUserId : answer.userId;
 
   // Check answer not founds
   if (!answer) {
@@ -139,7 +141,7 @@ const updateAnswer = asyncHandler(async (req, res) => {
 
   const updatedAnswer = await Answer.findByIdAndUpdate(
     req.params.id,
-    req.body,
+    { ...req.body, userId },
     {
       new: true,
     }
