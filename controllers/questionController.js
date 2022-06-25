@@ -34,7 +34,7 @@ const getQuestions = asyncHandler(async (req, res) => {
   const { search } = req.query;
 
   // Search by id
-  const isId = (search && search.length === 24 && !search.split(' ')[1]);
+  const isId = search && search.length === 24 && !search.split(' ')[1];
   if (isId) {
     const question = await Question.findById(search);
     return res.status(200).json([question]);
@@ -64,7 +64,7 @@ const paginateQuestions = asyncHandler(async (req, res) => {
   const sort = { createdAt: -1 };
 
   // Search by id
-  const isId = (search && search.length === 24 && !search.split(' ')[1]);
+  const isId = search && search.length === 24 && !search.split(' ')[1];
   if (isId) {
     const question = await Question.findById(search);
     const questions = {
@@ -100,7 +100,7 @@ const paginateQuestions = asyncHandler(async (req, res) => {
   const titleCondition = title
     ? { title: { $regex: new RegExp(title), $options: 'i' } }
     : {};
-  const tagCondition = tagId ? { "tags._id": { $in: [tagId] } } : {};
+  const tagCondition = tagId ? { 'tags._id': { $in: [tagId] } } : {};
   const condition = search ? { ...titleCondition, ...tagCondition } : {};
 
   const data = await Question.paginate(condition, { offset, limit, sort });
@@ -161,7 +161,7 @@ const getQuestionById = asyncHandler(async (req, res) => {
 // @route   POST /api/questions
 // @access  Private
 const createQuestion = asyncHandler(async (req, res) => {
-  const { title, content, tags = [] } = req.body;
+  const { title, content, tags = [], reqUserId } = req.body;
 
   // Check required fields
   if (!title | !content) {
@@ -181,7 +181,7 @@ const createQuestion = asyncHandler(async (req, res) => {
   }
 
   const question = await Question.create({
-    userId: req.user.id,
+    userId: reqUserId ? reqUserId : req.user.id,
     title,
     content,
     tags,
@@ -195,7 +195,9 @@ const createQuestion = asyncHandler(async (req, res) => {
 // @route   PUT /api/questions/:id
 // @access  Private
 const updateQuestion = asyncHandler(async (req, res) => {
+  const { reqUserId } = req.body;
   const question = await Question.findById(req.params.id);
+  const userId = reqUserId ? reqUserId : question.userId;
 
   // Check question not founds
   if (!question) {
@@ -226,7 +228,7 @@ const updateQuestion = asyncHandler(async (req, res) => {
 
   const updatedQuestion = await Question.findByIdAndUpdate(
     req.params.id,
-    req.body,
+    { ...req.body, userId },
     {
       new: true,
     }
