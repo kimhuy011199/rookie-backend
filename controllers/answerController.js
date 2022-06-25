@@ -236,9 +236,15 @@ const likeOrUnlikeAnswer = asyncHandler(async (req, res) => {
 const getUsersLikeByAnswerId = asyncHandler(async (req, res) => {
   const answerId = req.params.id;
   const answer = await Answer.findById(answerId);
+
+  // Check answer not founds
+  if (!answer) {
+    res.status(404);
+    throw new Error(ERROR_MESSAGE.ANSWER_NOT_FOUND);
+  }
+
   const usersList = [];
   const usersArr = Object.keys(answer.userLikes);
-
   for (let i = 0; i < usersArr.length; i++) {
     const user = await User.findById(usersArr[i]);
     usersList.push(user);

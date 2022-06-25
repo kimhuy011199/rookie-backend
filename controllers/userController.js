@@ -287,13 +287,24 @@ const deleteUser = asyncHandler(async (req, res) => {
   await Notification.deleteMany({ userId });
   await Notification.deleteMany({ actionId: userId });
   // Remove related likes
-  const relatedAnswers = await Answer.find();
-  for (let index = 0; index < relatedAnswers.length; index++) {
-    const answer = await Answer.findOne({
-      _id: relatedAnswers[index]._id.toString(),
-    });
-    await answer.tags.pull();
-    await answer.save();
+  const allAnswer = await Answer.find({});
+  for (let i = 0; i < allAnswer.length; i++) {
+    const answer = await Answer.findOne({ _id: allAnswer[i]._id.toString() });
+    const newAnswer = { ...answer }._doc;
+    if (!!newAnswer?.userLikes[userId]) {
+      delete newAnswer.userLikes[userId];
+      newAnswer.likesCount--;
+      await Answer.findByIdAndUpdate(
+        allAnswer[i]._id.toString(),
+        {
+          userLikes: newAnswer.userLikes,
+          likesCount: newAnswer.likesCount,
+        },
+        {
+          new: true,
+        }
+      );
+    }
   }
 
   res.status(200).json({ id: userId });
