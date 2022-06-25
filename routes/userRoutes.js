@@ -5,6 +5,7 @@ const {
   loginUser,
   getMe,
   paginateUsers,
+  getUsers,
   getUserById,
   updateUser,
   changePassword,
@@ -17,6 +18,7 @@ router.post('/', registerUser);
 router.post('/login', loginUser);
 router.post('/reset-password/:id', protect, resetPassword);
 router.get('/', protect, paginateUsers);
+router.get('/all', protect, getUsers);
 router.get('/me', protect, getMe);
 router.get('/:id', getUserById);
 router.put('/:id/password', protect, changePassword);

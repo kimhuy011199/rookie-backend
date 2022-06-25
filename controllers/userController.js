@@ -5,6 +5,9 @@ const { ITEMS_PER_PAGE, ROLE } = require('../core/contants/constants');
 const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
 
 const User = require('../models/userModel');
+const Answer = require('../models/answerModel');
+const Question = require('../models/questionModel');
+const Notification = require('../models/notificationModel');
 
 // @type    REGISTER_USER
 // @desc    Register new user
@@ -126,6 +129,32 @@ const paginateUsers = asyncHandler(async (req, res) => {
   res.status(200).json(users);
 });
 
+// @type    GET_ENTRIES
+// @desc    Get users
+// @route   GET /api/users/all
+// @access  Public
+const getUsers = asyncHandler(async (req, res) => {
+  const { search } = req.query;
+
+  // Search by id
+  const isId = search && search.length === 24 && !search.split(' ')[1];
+  if (isId) {
+    const user = await User.findById(search);
+    return res.status(200).json([user]);
+  }
+
+  // Search by display name
+  const condition = search
+    ? { displayName: { $regex: new RegExp(search), $options: 'i' } }
+    : {};
+
+  const users = await User.find(condition).sort({
+    createdAt: -1,
+  });
+
+  res.status(200).json(users);
+});
+
 // @type    GET_ENTRY_BY_ID
 // @desc    Get user by id
 // @route   GET /api/users/:id
@@ -234,7 +263,8 @@ const changePassword = asyncHandler(async (req, res) => {
 // @route   DELETE /api/users/:id
 // @access  Private
 const deleteUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const userId = req.params.id;
+  const user = await User.findById(userId);
 
   // Check user not founds
   if (!req.user) {
@@ -247,9 +277,26 @@ const deleteUser = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGE.PERMISSION_DENID);
   }
 
+  // Remove user
   await user.remove();
+  // Remove answers
+  await Answer.deleteMany({ userId });
+  // Remove questions
+  await Question.deleteMany({ userId });
+  // Remove related notifications
+  await Notification.deleteMany({ userId });
+  await Notification.deleteMany({ actionId: userId });
+  // Remove related likes
+  const relatedAnswers = await Answer.find();
+  for (let index = 0; index < relatedAnswers.length; index++) {
+    const answer = await Answer.findOne({
+      _id: relatedAnswers[index]._id.toString(),
+    });
+    await answer.tags.pull();
+    await answer.save();
+  }
 
-  res.status(200).json({ id: req.params.id });
+  res.status(200).json({ id: userId });
 });
 
 // Generate JWT
@@ -303,6 +350,7 @@ module.exports = {
   loginUser,
   getMe,
   paginateUsers,
+  getUsers,
   getUserById,
   updateUser,
   changePassword,
