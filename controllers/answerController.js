@@ -229,6 +229,24 @@ const likeOrUnlikeAnswer = asyncHandler(async (req, res) => {
   res.status(200).json(updatedAnswer);
 });
 
+// @type    GET_ENTRIES2_BY_ENTRY_ID
+// @desc    Get users like by answer id
+// @route   GET /api/answers/likes/:answerId
+// @access  Public
+const getUsersLikeByAnswerId = asyncHandler(async (req, res) => {
+  const answerId = req.params.id;
+  const answer = await Answer.findById(answerId);
+  const usersList = [];
+  const usersArr = Object.keys(answer.userLikes);
+
+  for (let i = 0; i < usersArr.length; i++) {
+    const user = await User.findById(usersArr[i]);
+    usersList.push(user);
+  }
+
+  res.status(200).json({ usersList, answerId });
+});
+
 module.exports = {
   getAnswersByQuestionId,
   paginateAnswers,
@@ -237,4 +255,5 @@ module.exports = {
   updateAnswer,
   deleteAnswer,
   likeOrUnlikeAnswer,
+  getUsersLikeByAnswerId,
 };

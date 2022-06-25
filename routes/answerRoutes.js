@@ -8,12 +8,14 @@ const {
   updateAnswer,
   deleteAnswer,
   likeOrUnlikeAnswer,
+  getUsersLikeByAnswerId,
 } = require('../controllers/answerController');
 
 const { protect } = require('../middleware/authMiddleware');
 
 router.get('/', paginateAnswers);
 router.get('/questions/:id', getAnswersByQuestionId);
+router.get('/likes/:id', getUsersLikeByAnswerId);
 router.get('/:id', protect, getAnswerById);
 router.post('/', protect, createAnswer);
 router.put('/:id', protect, updateAnswer);
