@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const asyncHandler = require('express-async-handler');
-const { ITEMS_PER_PAGE, ROLE, NOTIFICATION_TYPE } = require('../core/contants/constants');
+const {
+  ITEMS_PER_PAGE,
+  ROLE,
+  NOTIFICATION_TYPE,
+} = require('../core/contants/constants');
 const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
 
 const Answer = require('../models/answerModel');
@@ -81,7 +85,7 @@ const getAnswerById = asyncHandler(async (req, res) => {
 // @route   POST /api/answers
 // @access  Private
 const createAnswer = asyncHandler(async (req, res) => {
-  const { content, questionId } = req.body;
+  const { content, questionId, reqUserId } = req.body;
 
   // Check required fields
   if (!content || !questionId) {
@@ -94,7 +98,7 @@ const createAnswer = asyncHandler(async (req, res) => {
     throw new Error(ERROR_MESSAGE.USER_NOT_FOUND);
   }
 
-  const userId = req.user.id;
+  const userId = reqUserId ? reqUserId : req.user.id;
   const user = await User.findById(userId);
   const answer = await Answer.create({
     userId,
@@ -174,7 +178,10 @@ const deleteAnswer = asyncHandler(async (req, res) => {
   await answer.remove();
   // Remove related notifcation
   const { questionId } = answer;
-  await Notification.deleteMany({ questionId, type: NOTIFICATION_TYPE.LIKE_COMMENT });
+  await Notification.deleteMany({
+    questionId,
+    type: NOTIFICATION_TYPE.LIKE_COMMENT,
+  });
 
   res.status(200).json({ id: answerId });
 });
