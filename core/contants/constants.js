@@ -8,9 +8,9 @@ const NOTI_ACTIONS = {
 
 const ITEMS_PER_PAGE = {
   ANSWER: 10,
-  QUESTION: 5,
+  QUESTION: 10,
   TAG: 10,
-  USER: 2,
+  USER: 10,
 };
 
 const NOTIFICATION_TYPE = {

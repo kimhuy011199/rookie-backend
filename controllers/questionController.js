@@ -1,18 +1,13 @@
 const asyncHandler = require('express-async-handler');
 const { ITEMS_PER_PAGE, ROLE } = require('../core/contants/constants');
 const { ERROR_MESSAGE } = require('../core/contants/errorMessage');
-const ContentBasedRecommendationSystem = require('../core/services/content-based-recommendation');
+const { recommendQuestions } = require('../core/services/recommendation');
 
 const Question = require('../models/questionModel');
 const User = require('../models/userModel');
 const Tag = require('../models/tagModel');
 const Answer = require('../models/answerModel');
 const Notification = require('../models/notificationModel');
-
-const recommender = new ContentBasedRecommendationSystem({
-  minScore: 0.01,
-  maxSimilarDocuments: 100,
-});
 
 // @type    GET_ENTRIES_BY_ENTRY2_ID
 // @desc    Get questions by user id
@@ -280,14 +275,9 @@ const deleteQuestion = asyncHandler(async (req, res) => {
 const getRecommendQuestions = asyncHandler(async (req, res) => {
   const documents = await Question.find();
 
-  recommender.train(documents);
-  const recommendQuestions = recommender
-    .getSimilarDocuments(req.params.id, 0, 10)
-    .map((item) => {
-      return { ...item._doc, score: item.score };
-    });
+  const questionsList = recommendQuestions(documents, req.params.id);
 
-  res.status(200).json(recommendQuestions);
+  res.status(200).json(questionsList);
 });
 
 module.exports = {
