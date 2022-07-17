@@ -101,8 +101,9 @@ const recommendQuestions = (questions, questionId) => {
 
   // STEP 4: order the result
   result.sort((a, b) => b.score - a.score);
+  const recommendationQuestions = result.splice(0, 10);
   
-  return result;
+  return recommendationQuestions;
 }
 
 module.exports = { recommendQuestions };

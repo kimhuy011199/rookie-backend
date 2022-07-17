@@ -4,6 +4,14 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const http = require('http');
 const connectDB = require('./config/db');
+const {
+  initTags,
+  initUsers,
+  initQuestions,
+  initAnswers,
+  initUserLikes,
+} = require('./core/services/init-database');
+const { resetDatabase } = require('./core/services/reset-database');
 const { errorHandler } = require('./middleware/errorMiddleware');
 const { NOTI_ACTIONS } = require('./core/contants/constants');
 const port = process.env.PORT || 443;
@@ -53,3 +61,10 @@ io.on(NOTI_ACTIONS.CONNECT, (socket) => {
 });
 
 server.listen(port, () => console.log(`Server runs on port ${port}`));
+
+// resetDatabase();
+// initTags();
+// initUsers();
+// initQuestions();
+// initAnswers();
+// initUserLikes();
